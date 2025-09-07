@@ -7,6 +7,10 @@
 }:
 let
   cfg = config.services.pelican-panel;
+  artisanWrapper = import ./artisan-wrapper.nix {
+    inherit pkgs;
+    inherit cfg;
+  };
 in
 {
   options.services.pelican-panel = {
@@ -56,6 +60,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    environment.systemPackages = [ artisanWrapper ];
+
     services.phpfpm.pools.pelican-panel = {
       user = cfg.user;
       group = cfg.group;
