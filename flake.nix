@@ -4,10 +4,26 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.05";
   };
-
   outputs =
-    { ... }:
+    { nixpkgs, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      package = pkgs.callPackage ./lib.nix { };
+    in
     {
-      nixosModules.pelican-panel = import ./module.nix;
+      packages.${system} = {
+        default = package;
+        pelican-panel = package;
+      };
+
+      nixosModules.pelican-panel =
+        args:
+        import ./module.nix (
+          args
+          // {
+            pelicanPanelPkg = package;
+          }
+        );
     };
 }

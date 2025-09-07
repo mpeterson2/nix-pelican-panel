@@ -1,34 +1,51 @@
-{ stdenv, greeting }:
+{
+  lib,
+  fetchFromGitHub,
+  php,
+}:
+let
+  version = "1.0.0-beta25";
+  phpWithExtensions = php.withExtensions (
+    { enabled, all }:
+    with all;
+    [
+      gd
+      mysqli
+      mbstring
+      bcmath
+      curl
+      zip
+      intl
+      sqlite3
+    ]
+    ++ enabled
+  );
+in
+php.buildComposerProject {
+  pname = "pelican-panel";
+  inherit version;
 
-stdenv.mkDerivation rec {
-  name = "pelican-panel";
-  version = "1.0";
+  src = fetchFromGitHub {
+    owner = "pelican-dev";
+    repo = "panel";
+    rev = "v${version}";
+    sha256 = "sha256-RXtsPYAzz5fZGSq9b8qhbsSYSlz/JazBdEGESN7Cta4=";
+  };
 
-  src = ./.;
+  composerLock = "$src/composer.lock";
 
-  nativeBuildInputs = [ ];
-  buildInputs = [ ];
+  vendorHash = "sha256-Be1OOHeWClnXpimtjwMmN8Z9fc4BWqwpjfx1mPln5Zg=";
 
-  buildPhase = ''
-    cat > program.c <<EOF
-    #include <stdio.h>
+  php = phpWithExtensions;
 
-    int main() {
-       printf("Hello, ${greeting}!\\n");
-       return 0;
-    }
-    EOF
+  passthru = {
+    php = phpWithExtensions;
+  };
 
-    gcc program.c -o ${name}
-  '';
-
-  installPhase = ''
-    mkdir -p $out/bin
-    cp ${name} $out/bin
-  '';
-
-  meta = {
-    description = "Host Pelican Panel";
-    platform = stdenv.lib.platforms.unix;
+  meta = with lib; {
+    description = "Pelican Panel";
+    homepage = "https://pelican.dev/";
+    license = licenses.agpl3Only;
+    platforms = platforms.linux;
   };
 }

@@ -1,7 +1,7 @@
 {
   lib,
   config,
-  pkgs,
+  pelicanPanelPkg,
   ...
 }:
 let
@@ -11,16 +11,36 @@ in
   options.services.pelican-panel = {
     enable = lib.mkEnableOption "Pelican Panel service";
 
-    greeting = lib.mkOption {
+    host = lib.mkOption {
       type = lib.types.str;
-      default = "World";
-      description = "What Pelican Panel should say hello to.";
+      default = "localhost";
+      description = "What host to bind to";
+    };
+
+    port = lib.mkOption {
+      type = lib.types.int;
+      default = "8080";
+      description = "What port to bind to";
     };
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [
-      (pkgs.callPackage ./lib.nix { greeting = cfg.greeting; })
-    ];
+    systemd.services.pelican-panel = {
+      enable = cfg.enable;
+      description = "Pelican Panel";
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        ExecStart = "${pelicanPanelPkg}/bin/pelican-panel";
+        Environment = [
+          "HOST=${cfg.host}"
+          "PORT=${toString cfg.port}"
+        ];
+      };
+    };
+
+    services.phpfpm.pools.pelican-panel = {
+      user = "pelican-panel";
+      phpPackage = pelicanPanelPkg.php;
+    };
   };
 }
