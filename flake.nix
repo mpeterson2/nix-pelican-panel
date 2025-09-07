@@ -22,6 +22,7 @@
         import ./module.nix (
           args
           // {
+            pkgs = pkgs;
             pelicanPanelPkg = package;
           }
         );

@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   pelicanPanelPkg,
   ...
 }:
@@ -46,13 +47,19 @@ in
       default = true;
       description = "Whether to open the pelican panel port in the firewall.";
     };
+
+    runtimeLocation = lib.mkOption {
+      type = lib.types.path;
+      default = "/srv/http/pelican-panel";
+      description = "Path to store the served files";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     services.phpfpm.pools.pelican-panel = {
       user = cfg.user;
       group = cfg.group;
-      listen = "${cfg.host}:${toString cfg.phpFpmPort}";
+      listen = "${cfg.host}:${toString cfg.phpFpmPort}"; # TODO: this is deprecated, how to solve?
       phpPackage = pelicanPanelPkg.php;
 
       settings = {
@@ -75,10 +82,32 @@ in
             port = cfg.port;
           }
         ];
-        root = "${pelicanPanelPkg}/share/php/pelican-panel/public";
+        root = "${cfg.runtimeLocation}/public";
+
         locations."/".extraConfig = ''
+          index index.php index.html;
+
           try_files $uri /index.php?$query_string;
+
+          location ~ \.php$ {
+            include ${pkgs.nginx}/conf/fastcgi.conf;
+            fastcgi_pass ${cfg.host}:${toString cfg.phpFpmPort};
+          }
         '';
+      };
+    };
+
+    systemd.services.pelican-panel-copy-app = {
+      description = "Copy Pelican Panel to a workable directory";
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = [
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}"
+          "${pkgs.rsync}/bin/rsync -a --delete ${pelicanPanelPkg}/share/php/pelican-panel/ ${cfg.runtimeLocation}/"
+          "${pkgs.coreutils}/bin/chown -R ${cfg.user}:${cfg.group} ${cfg.runtimeLocation}"
+          "${pkgs.coreutils}/bin/chmod -R 755 ${cfg.runtimeLocation}"
+        ];
       };
     };
 
