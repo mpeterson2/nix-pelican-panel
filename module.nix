@@ -65,10 +65,10 @@ in
     services.phpfpm.pools.pelican-panel = {
       user = cfg.user;
       group = cfg.group;
-      listen = "${cfg.host}:${toString cfg.phpFpmPort}"; # TODO: this is deprecated, how to solve?
       phpPackage = pelicanPanelPkg.php;
 
       settings = {
+        "listen.owner" = config.services.nginx.user;
         "pm" = "dynamic";
         "pm.max_children" = 32;
         "pm.max_requests" = 500;
@@ -97,7 +97,7 @@ in
 
         locations."~ \.php$".extraConfig = ''
           include ${pkgs.nginx}/conf/fastcgi.conf;
-          fastcgi_pass ${cfg.host}:${toString cfg.phpFpmPort};
+          fastcgi_pass unix:${config.services.phpfpm.pools.pelican-panel.socket};
         '';
       };
     };
