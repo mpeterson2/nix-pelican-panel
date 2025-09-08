@@ -92,13 +92,12 @@ in
 
         locations."/".extraConfig = ''
           index index.php index.html;
+          try_files $uri $uri/ /index.php?$query_string;
+        '';
 
-          try_files $uri /index.php?$query_string;
-
-          location ~ \.php$ {
-            include ${pkgs.nginx}/conf/fastcgi.conf;
-            fastcgi_pass ${cfg.host}:${toString cfg.phpFpmPort};
-          }
+        locations."~ \.php$".extraConfig = ''
+          include ${pkgs.nginx}/conf/fastcgi.conf;
+          fastcgi_pass ${cfg.host}:${toString cfg.phpFpmPort};
         '';
       };
     };

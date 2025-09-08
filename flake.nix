@@ -9,7 +9,7 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      package = pkgs.callPackage ./lib.nix { };
+      package = pkgs.callPackage ./lib/pelican-panel.nix { };
     in
     {
       packages.${system} = {

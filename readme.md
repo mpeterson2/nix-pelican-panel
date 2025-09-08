@@ -2,7 +2,10 @@
 
 Run Pelican Panel on NixOS
 
-## Setup
+> [!WARNING]
+> This readme assumes you did not modify default settings. Some commands may need to change if you do.
+
+## Usage
 
 **Update your flake**
 
@@ -45,6 +48,10 @@ outputs =
 
 **Setup the env file**
 
-Run `sudo -u pelican-panel pelican-panel-artisan p:environment:setup` (assuming pelican-panel is the user you are using to run the app)
+Run `sudo -u pelican-panel pelican-panel-artisan p:environment:setup`.
 
-You can now modify the env in `/svr/http/pelican-panel/.env`
+You can now modify the env in `/svr/http/pelican-panel/.env`.
+
+** Run migrations**
+
+Run `sudo -u pelican-panel pelican-panel-artisan migrate`.
