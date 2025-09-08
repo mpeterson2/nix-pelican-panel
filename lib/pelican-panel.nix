@@ -50,9 +50,6 @@ pkgs.stdenv.mkDerivation {
   buildInputs = [ pkgs.coreutils ];
 
   installPhase = ''
-    echo ${jsOut}
-    echo $(ls ${jsOut})
-    echo ${phpOut}
     mkdir -p $out/share/php/pelican-panel/public/build
     cp -r ${phpOut}/share/php/pelican-panel-php/. $out/share/php/pelican-panel
     cp -r ${jsOut}/. $out/share/php/pelican-panel/public/build

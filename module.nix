@@ -102,17 +102,26 @@ in
       };
     };
 
-    systemd.services.pelican-panel-copy-app = {
-      description = "Copy Pelican Panel to a workable directory";
+    systemd.services.pelican-panel-deploy = {
+      description = "Deploy Pelican Panel";
+      after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = [
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}"
-          "${pkgs.rsync}/bin/rsync -a --delete ${pelicanPanelPkg}/share/php/pelican-panel/ ${cfg.runtimeLocation}/"
+          ''
+            ${pkgs.rsync}/bin/rsync -a --delete \
+            --exclude='.env' \
+            --exclude='storage' \
+            --exclude='bootstrap/cache' \
+            ${pelicanPanelPkg}/share/php/pelican-panel/ \
+            ${cfg.runtimeLocation}/
+          ''
           "${pkgs.coreutils}/bin/chown -R ${cfg.user}:${cfg.group} ${cfg.runtimeLocation}"
           "${pkgs.coreutils}/bin/chmod -R 755 ${cfg.runtimeLocation}"
         ];
+        RemainAfterExit = true;
       };
     };
 
