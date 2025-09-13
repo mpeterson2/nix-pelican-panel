@@ -42,7 +42,10 @@ outputs =
     inputs.pelican-panel.nixosModules.pelican-panel
   ];
 
-  services.pelican-panel.enable = true;
+  services.pelican-panel = {
+    enable = true;
+    nginx.enable = true;
+  };
 }
 ```
 
