@@ -28,10 +28,18 @@ in
       description = "The port the web server will listen on.";
     };
 
-    phpFpmPort = lib.mkOption {
-      type = lib.types.int;
-      default = 9000;
-      description = "The port the PHP FMP will listen on.";
+    phpfpm = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          poolName = lib.mkOption {
+            type = lib.types.str;
+            default = "pelican-panel";
+            description = "The pool name the PHP FMP run as.";
+          };
+        };
+      };
+      default = { };
+      description = "Config for Phpfpm.";
     };
 
     user = lib.mkOption {
@@ -57,12 +65,28 @@ in
       default = "/srv/http/pelican-panel";
       description = "Path to store the served files";
     };
+
+    nginx = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          enable = lib.mkEnableOption "Enable Nginx.";
+
+          virtualHost = lib.mkOption {
+            type = lib.types.str;
+            default = "pelican-panel";
+            description = "Virtual host for Nginx.";
+          };
+        };
+      };
+      default = { };
+      description = "Config for Nginx";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ artisanWrapper ];
 
-    services.phpfpm.pools.pelican-panel = {
+    services.phpfpm.pools."${cfg.phpfpm.poolName}" = {
       user = cfg.user;
       group = cfg.group;
       phpPackage = pelicanPanelPkg.php;
@@ -78,10 +102,10 @@ in
       };
     };
 
-    services.nginx = {
-      enable = true;
+    services.nginx = lib.mkIf cfg.nginx.enable {
+      enable = cfg.nginx.enable;
 
-      virtualHosts."pelican-panel" = {
+      virtualHosts.${cfg.nginx.virtualHost} = {
         listen = [
           {
             addr = cfg.host;
@@ -97,7 +121,7 @@ in
 
         locations."~ \.php$".extraConfig = ''
           include ${pkgs.nginx}/conf/fastcgi.conf;
-          fastcgi_pass unix:${config.services.phpfpm.pools.pelican-panel.socket};
+          fastcgi_pass unix:${config.services.phpfpm.pools.${cfg.phpfpm.poolName}.socket};
         '';
       };
     };
