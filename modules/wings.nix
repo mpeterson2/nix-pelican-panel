@@ -7,16 +7,15 @@
 }:
 let
   cfg = config.services.wings;
+  toSnakeCase = import ../utils/to-snake-case.nix { inherit lib; };
+  convertAttributes = import ../utils/convert-attributes.nix {
+    inherit lib;
+    converter = toSnakeCase;
+  };
 in
 {
   options.services.wings = {
     enable = lib.mkEnableOption "Enable wings.";
-
-    user = lib.mkOption {
-      description = "The user Wings should run as.";
-      default = "wings";
-      type = lib.types.string;
-    };
 
     node = lib.mkOption {
       description = "Define your Wings nodes. Many of these values will come when creating your node from the panel.";
@@ -30,18 +29,18 @@ in
           };
 
           uuid = lib.mkOption {
-            description = "The Node's ID.";
+            description = "The node's ID.";
             type = lib.types.str;
           };
 
           tokenId = lib.mkOption {
-            description = "The Node's token id.";
+            description = "The node's token id.";
             type = lib.types.str;
           };
 
           token = lib.mkOption {
-            description = "The path to your token.";
-            type = lib.types.path;
+            description = "The node's token.";
+            type = lib.types.str;
           };
 
           api = lib.mkOption {
@@ -138,6 +137,34 @@ in
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ wingsPackage ];
-    environment.etc."/pelican/config.yml".source = (pkgs.formats.yaml { }).generate "" cfg.node;
+    environment.etc."/pelican/config.yml".source = (pkgs.formats.yaml { }).generate "" (
+      convertAttributes cfg.node
+    );
+
+    virtualisation.docker.enable = true;
+
+    systemd.services.wings = {
+      description = "Wings Daemon";
+      after = [
+        "network.target"
+        "docker.service"
+      ];
+      requires = [ "docker.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      serviceConfig = {
+        ExecStart = "${wingsPackage}/bin/wings";
+        Restart = "always";
+        RestartSec = "5s";
+        SupplementaryGroups = [ "docker" ];
+      };
+    };
+
+    users.users.pelican = {
+      isSystemUser = true;
+      group = "pelican";
+    };
+
+    users.groups.pelican = { };
   };
 }
