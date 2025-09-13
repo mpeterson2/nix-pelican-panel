@@ -10,8 +10,8 @@ in
 {
   options.services.wings = {
     enable = lib.mkEnableOption "Enable wings.";
-    nodes = lib.mkOption {
-      type = lib.types.listOf lib.types.submodule {
+    node = lib.mkOption {
+      type = lib.types.submodule {
         options = {
           debug = lib.mkOption {
             type = lib.types.bool;

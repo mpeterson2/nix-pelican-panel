@@ -75,15 +75,13 @@ On the panel, create a wing, note the config and translate it to nix config:
 
   services.wings = {
     enable = true;
-    nodes = [
-      {
-        uuid = "<node-uuid>";
-        tokenId = "<node-token>";
-        # Recommended to use sops or another form of encrypting this value
-        token = config.sops.secrets.wings.token;
-        remote = "<node-remote>";
-      }
-    ];
+    node = {
+      uuid = "<node-uuid>";
+      tokenId = "<node-token>";
+      # Recommended to use sops or another form of encrypting this value
+      token = config.sops.secrets.wings.token;
+      remote = "<node-remote>";
+    };
   };
 }
 ```
