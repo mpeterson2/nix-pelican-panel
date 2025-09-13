@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  wingsPackage,
   ...
 }:
 let
@@ -109,5 +110,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    environment.systemPackages = [ wingsPackage ];
   };
 }

@@ -9,12 +9,14 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      package = pkgs.callPackage ./lib/pelican-panel.nix { };
+      pelicanPanelPackage = pkgs.callPackage ./lib/pelican-panel.nix { };
+      wingsPackage = pkgs.callPackage ./lib/wings.nix { };
     in
     {
       packages.${system} = {
-        default = package;
-        pelican-panel = package;
+        default = pelicanPanelPackage;
+        pelican-panel = pelicanPanelPackage;
+        wings = wingsPackage;
       };
 
       nixosModules.pelican-panel =
@@ -23,7 +25,7 @@
           args
           // {
             pkgs = pkgs;
-            pelicanPanelPkg = package;
+            pelicanPanelPkg = pelicanPanelPackage;
           }
         );
 
@@ -33,6 +35,7 @@
           args
           // {
             pkgs = pkgs;
+            wingsPackage = wingsPackage;
           }
         );
     };
