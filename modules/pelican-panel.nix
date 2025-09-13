@@ -19,18 +19,20 @@ in
     enable = lib.mkEnableOption "Pelican Panel service";
 
     host = lib.mkOption {
-      type = lib.types.str;
+      description = "The host Pelican Panel will listen on.";
       default = "0.0.0.0";
-      description = "The host pelican panel will listen on.";
+      type = lib.types.str;
     };
 
     port = lib.mkOption {
-      type = lib.types.int;
-      default = 8080;
       description = "The port the web server will listen on.";
+      default = 8080;
+      type = lib.types.int;
     };
 
     phpfpm = lib.mkOption {
+      description = "Config for Phpfpm.";
+      default = { };
       type = lib.types.submodule {
         options = {
           poolName = lib.mkOption {
@@ -40,35 +42,35 @@ in
           };
         };
       };
-      default = { };
-      description = "Config for Phpfpm.";
     };
 
     user = lib.mkOption {
-      type = lib.types.str;
+      description = "The user Pelican Panel should run as.";
       default = "pelican-panel";
-      description = "The user pelican panel should run as.";
+      type = lib.types.str;
     };
 
     group = lib.mkOption {
-      type = lib.types.str;
+      description = "The group Pelican Panel should run as.";
       default = "pelican-panel";
-      description = "The group pelican panel should run as.";
+      type = lib.types.str;
     };
 
     openFirewall = lib.mkOption {
-      type = lib.types.bool;
+      description = "Whether to open the Pelican Panel port in the firewall.";
       default = true;
-      description = "Whether to open the pelican panel port in the firewall.";
+      type = lib.types.bool;
     };
 
     runtimeLocation = lib.mkOption {
-      type = lib.types.path;
-      default = "/srv/http/pelican-panel";
       description = "Path to store the served files";
+      default = "/srv/http/pelican-panel";
+      type = lib.types.path;
     };
 
     nginx = lib.mkOption {
+      description = "Config for Nginx";
+      default = { };
       type = lib.types.submodule {
         options = {
           enable = lib.mkEnableOption "Enable Nginx.";
@@ -76,26 +78,24 @@ in
           enableACME = lib.mkEnableOption "Enable ACME. Define your ACME config before enabling.";
 
           sslCertificate = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
             description = "SSL certificate.";
             default = null;
+            type = lib.types.nullOr lib.types.str;
           };
 
           sslCertificateKey = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
             description = "SSL certificate key.";
             default = null;
+            type = lib.types.nullOr lib.types.str;
           };
 
           virtualHost = lib.mkOption {
-            type = lib.types.str;
-            default = "pelican-panel";
             description = "Virtual host for Nginx.";
+            default = "pelican-panel";
+            type = lib.types.str;
           };
         };
       };
-      default = { };
-      description = "Config for Nginx";
     };
   };
 
