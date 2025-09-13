@@ -12,6 +12,16 @@ let
     inherit lib;
     converter = toSnakeCase;
   };
+
+  configPathInEtc = "/pelican/config.yml";
+  configPath = "/etc" + configPathInEtc;
+
+  tokenWriterScript = pkgs.writeShellScript "wings-token-writer" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOKEN=$(${pkgs.coreutils}/bin/cat ${cfg.node.tokenPath})
+    ${pkgs.yq-go}/bin/yq -i ".token = \"$TOKEN\"" "${configPath}"
+  '';
 in
 {
   options.services.wings = {
@@ -38,8 +48,8 @@ in
             type = lib.types.str;
           };
 
-          token = lib.mkOption {
-            description = "The node's token.";
+          tokenPath = lib.mkOption {
+            description = "The filepath to the node's token.";
             type = lib.types.str;
           };
 
@@ -137,7 +147,7 @@ in
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ wingsPackage ];
-    environment.etc."/pelican/config.yml".source = (pkgs.formats.yaml { }).generate "" (
+    environment.etc."${configPathInEtc}".source = (pkgs.formats.yaml { }).generate "" (
       convertAttributes cfg.node
     );
 
@@ -157,6 +167,16 @@ in
         Restart = "always";
         RestartSec = "5s";
         SupplementaryGroups = [ "docker" ];
+      };
+    };
+
+    systemd.services.wings-token-writer = {
+      description = "Write token";
+      wantedBy = [ "multi-user.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = tokenWriterScript;
       };
     };
 
