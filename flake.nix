@@ -19,11 +19,20 @@
 
       nixosModules.pelican-panel =
         args:
-        import ./module.nix (
+        import ./modules/pelican-panel.nix (
           args
           // {
             pkgs = pkgs;
             pelicanPanelPkg = package;
+          }
+        );
+
+      nixosModules.wings =
+        args:
+        import ./modules/wings.nix (
+          args
+          // {
+            pkgs = pkgs;
           }
         );
     };

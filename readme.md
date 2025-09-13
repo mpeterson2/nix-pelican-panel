@@ -36,7 +36,6 @@ outputs =
 
 ```nix
 { inputs, config, ... }:
-
 {
   imports = [
     inputs.pelican-panel.nixosModules.pelican-panel
@@ -58,3 +57,35 @@ You can now modify the env in `/svr/http/pelican-panel/.env`.
 ** Run migrations**
 
 Run `sudo -u pelican-panel pelican-panel-artisan migrate`.
+
+**Install your panel**
+
+Navigate to your pelican panel's `/installer` route and follow the instructions
+
+**Setup Wings**
+
+On the panel, create a wing, note the config and translate it to nix config:
+
+```nix
+{ inputs, config, ... }:
+{
+  imports = [
+    inputs.pelican-panel.nixosModules.wings
+  ];
+
+  services.wings = {
+    enable = true;
+    nodes = [
+      {
+        uuid = "<node-uuid>";
+        tokenId = "<node-token>";
+        # Recommended to use sops or another form of encrypting this value
+        token = config.sops.secrets.wings.token;
+        remote = "<node-remote>";
+      }
+    ];
+  };
+}
+```
+
+Note: This package provides the rest of the config as defaults, so no need to edit if you want to keep those.
