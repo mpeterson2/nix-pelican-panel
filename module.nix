@@ -161,6 +161,7 @@ in
             --exclude='.env' \
             --exclude='storage' \
             --exclude='bootstrap/cache' \
+            --exclude='database/database.sqlite' \
             ${pelicanPanelPkg}/share/php/pelican-panel/ \
             ${cfg.runtimeLocation}/
           ''
@@ -172,5 +173,37 @@ in
     };
 
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
+
+    systemd.services.pelican-panel-queue = {
+      description = "Pelican Panel queue worker";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.php}/bin/php /srv/http/pelican-panel/artisan queue:work --sleep=3 --tries=3";
+        User = cfg.user;
+        WorkingDirectory = cfg.runtimeLocation;
+        Restart = "always";
+        RestartSec = 5;
+      };
+    };
+
+    systemd.services.pelican-panel-schedule = {
+      description = "Run Pelican Panel schedule";
+      serviceConfig = {
+        ExecStart = "${pkgs.php}/bin/php /srv/http/pelican-panel/artisan schedule:run";
+        User = "pelican-panel";
+        WorkingDirectory = "/srv/http/pelican-panel";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
+
+    systemd.timers.pelican-panel-schedule = {
+      description = "Run Pelican Panel schedule every minute";
+      timerConfig = {
+        OnUnitActiveSec = "1m";
+        Persistent = true;
+      };
+      wantedBy = [ "timers.target" ];
+    };
   };
 }
