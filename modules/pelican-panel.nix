@@ -7,8 +7,6 @@
 }:
 let
   cfg = config.services.pelican-panel;
-  enableNginxSSL =
-    cfg.nginx.enableACME || (cfg.nginx.sslCertificate != null && cfg.nginx.sslCertificateKey != null);
   artisanWrapper = import ./artisan-wrapper.nix {
     inherit pkgs;
     inherit cfg;
@@ -76,6 +74,8 @@ in
           enable = lib.mkEnableOption "Enable Nginx.";
 
           enableACME = lib.mkEnableOption "Enable ACME. Define your ACME config before enabling.";
+          enableSSL = lib.mkEnableOption "Enable SSL.";
+          forceSSL = lib.mkEnableOption "Force SSL.";
 
           sslCertificate = lib.mkOption {
             description = "SSL certificate.";
@@ -123,8 +123,8 @@ in
 
       virtualHosts.${cfg.nginx.virtualHost} = {
         enableACME = cfg.nginx.enableACME;
-        enableSSL = enableNginxSSL;
-        forceSSL = enableNginxSSL;
+        enableSSL = cfg.nginx.enableSSL;
+        forceSSL = cfg.nginx.forceSSL;
         sslCertificate = cfg.nginx.sslCertificate;
         sslCertificateKey = cfg.nginx.sslCertificateKey;
 
