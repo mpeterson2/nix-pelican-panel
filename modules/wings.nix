@@ -27,6 +27,12 @@ in
   options.services.wings = {
     enable = lib.mkEnableOption "Enable wings.";
 
+    openFirewall = lib.mkOption {
+      description = "Whether to open the Wings port in the firewall.";
+      default = true;
+      type = lib.types.bool;
+    };
+
     node = lib.mkOption {
       description = "Define your Wings nodes. Many of these values will come when creating your node from the panel.";
       default = { };
@@ -186,5 +192,7 @@ in
     };
 
     users.groups.pelican = { };
+
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.node.api.port ];
   };
 }
