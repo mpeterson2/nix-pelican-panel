@@ -54,7 +54,7 @@ Run `sudo -u pelican-panel pelican-panel-artisan p:environment:setup`.
 
 You can now modify the env in `/svr/http/pelican-panel/.env`.
 
-** Run migrations**
+**Run migrations**
 
 Run `sudo -u pelican-panel pelican-panel-artisan migrate`.
 
