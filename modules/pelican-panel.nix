@@ -179,7 +179,7 @@ in
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = "${pkgs.php}/bin/php /srv/http/pelican-panel/artisan queue:work --sleep=3 --tries=3";
+        ExecStart = "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan queue:work --sleep=3 --tries=3";
         User = cfg.user;
         WorkingDirectory = cfg.runtimeLocation;
         Restart = "always";
@@ -190,9 +190,9 @@ in
     systemd.services.pelican-panel-schedule = {
       description = "Run Pelican Panel schedule";
       serviceConfig = {
-        ExecStart = "${pkgs.php}/bin/php /srv/http/pelican-panel/artisan schedule:run";
-        User = "pelican-panel";
-        WorkingDirectory = "/srv/http/pelican-panel";
+        ExecStart = "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan schedule:run";
+        User = cfg.user;
+        WorkingDirectory = cfg.runtimeLocation;
       };
       wantedBy = [ "multi-user.target" ];
     };
