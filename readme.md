@@ -54,13 +54,15 @@ Run `sudo -u pelican-panel pelican-panel-artisan p:environment:setup`.
 
 You can now modify the env in `/svr/http/pelican-panel/.env`.
 
+Note: prior to running this, you may see some services failing. These services are typically enabled when you install the panel.
+
 **Run migrations**
 
 Run `sudo -u pelican-panel pelican-panel-artisan migrate`.
 
 **Install your panel**
 
-Navigate to your pelican panel's `/installer` route and follow the instructions
+Navigate to your pelican panel's `/installer` route and follow the instructions. When it comes to the page where it asks you to run commands, you can ignore it, they're already ran for you.
 
 **Setup Wings**
 
