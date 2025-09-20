@@ -94,6 +94,12 @@ in
             default = "pelican-panel";
             type = lib.types.str;
           };
+
+          extraConfig = lib.mkOption {
+            description = "Extra configuration for the server block.";
+            default = "";
+            type = lib.types.str;
+          };
         };
       };
     };
@@ -145,6 +151,8 @@ in
           include ${pkgs.nginx}/conf/fastcgi.conf;
           fastcgi_pass unix:${config.services.phpfpm.pools.${cfg.phpfpm.poolName}.socket};
         '';
+
+        extraConfig = cfg.nginx.extraConfig;
       };
     };
 
