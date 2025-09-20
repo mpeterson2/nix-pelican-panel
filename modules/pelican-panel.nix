@@ -156,6 +156,14 @@ in
         Type = "oneshot";
         ExecStart = [
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/bootstrap/cache"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/app/private"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/app/public"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/cache"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/sessions"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/testing"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/views"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/logs"
           ''
             ${pkgs.rsync}/bin/rsync -a --delete \
             --exclude='.env' \
