@@ -13,7 +13,7 @@ Run Pelican Panel on NixOS
 inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.05";
     pelican-panel = {
-      url = "<TODO>";
+      url = "github:mpeterson2/nix-pelican-panel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
