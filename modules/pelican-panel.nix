@@ -74,7 +74,7 @@ in
           enable = lib.mkEnableOption "Enable Nginx.";
 
           enableACME = lib.mkEnableOption "Enable ACME. Define your ACME config before enabling.";
-          enableSSL = lib.mkEnableOption "Enable SSL.";
+          addSSL = lib.mkEnableOption "Enable SSL.";
           forceSSL = lib.mkEnableOption "Force SSL.";
 
           sslCertificate = lib.mkOption {
@@ -129,7 +129,7 @@ in
 
       virtualHosts.${cfg.nginx.virtualHost} = {
         enableACME = cfg.nginx.enableACME;
-        enableSSL = cfg.nginx.enableSSL;
+        addSSL = cfg.nginx.addSSL;
         forceSSL = cfg.nginx.forceSSL;
         sslCertificate = cfg.nginx.sslCertificate;
         sslCertificateKey = cfg.nginx.sslCertificateKey;
