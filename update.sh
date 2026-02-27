@@ -2,6 +2,10 @@
 
 set -e
 
+quiet() {
+    "$@" >/dev/null 2>&1
+}
+
 get_latest_version() {
     local repo=$1
     curl -s "https://api.github.com/repos/pelican-dev/$repo/releases/latest" | jq -r '.tag_name' | sed 's/^v//'
@@ -49,16 +53,16 @@ panel_version=$(get_latest_version "panel")
 wings_version=$(get_latest_version "wings")
 
 echo "🔧 Updating Pelican Panel to $panel_version"
-update_version "lib/pelican-panel.nix" "$panel_version"
-update_source_hash "lib/pelican-panel.nix" "panel" "$panel_version"
-update_vendor_hash "lib/pelican-panel-php.nix" "pelican-panel"
-update_hash "lib/pelican-panel-js.nix" "pelican-panel"
+quiet update_version "lib/pelican-panel.nix" "$panel_version"
+quiet update_source_hash "lib/pelican-panel.nix" "panel" "$panel_version"
+quiet update_vendor_hash "lib/pelican-panel-php.nix" "pelican-panel"
+quiet update_hash "lib/pelican-panel-js.nix" "pelican-panel"
 
 echo "🔧 Updating Wings to $wings_version"
-update_version "lib/wings.nix" "$wings_version"
-update_source_hash "lib/wings.nix" "wings" "$wings_version"
+quiet update_version "lib/wings.nix" "$wings_version"
+quiet update_source_hash "lib/wings.nix" "wings" "$wings_version"
 
 echo "🔧 Updating Wings vendor hash..."
-update_vendor_hash "lib/wings.nix" "wings"
+quiet update_vendor_hash "lib/wings.nix" "wings"
 
 echo "✅ Done! Updated to Panel $panel_version, Wings $wings_version"
