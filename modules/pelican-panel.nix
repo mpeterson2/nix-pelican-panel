@@ -227,5 +227,23 @@ in
       };
       wantedBy = [ "timers.target" ];
     };
+
+    systemd.services.pelican-panel-upgrade = {
+      description = "Upgrade Pelican Panel";
+      after = [ "pelican-panel-deploy.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = [
+          "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan storage:link"
+          "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan optimize:clear"
+          "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan filament:optimize"
+          "${pkgs.php}/bin/php ${cfg.runtimeLocation}/artisan migrate --seed --force"
+        ];
+        User = cfg.user;
+        Group = cfg.group;
+        WorkingDirectory = cfg.runtimeLocation;
+      };
+    };
   };
 }
