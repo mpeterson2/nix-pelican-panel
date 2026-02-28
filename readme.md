@@ -52,7 +52,7 @@ outputs =
 
 Run `sudo -u pelican-panel pelican-panel-artisan p:environment:setup`.
 
-You can now modify the env in `/svr/http/pelican-panel/.env`.
+You can now modify the env in `/srv/http/pelican-panel/.env`.
 
 Note: prior to running this, you may see some services failing. These services are typically enabled when you install the panel.
 
