@@ -16,10 +16,10 @@ buildGoModule {
     owner = "pelican-dev";
     repo = "wings";
     rev = "v${version}";
-    sha256 = "";
+    sha256 = "sha256-MveNLXINvxAjJOG9nvXgfSxnEUkHI0Bnqxmgg/0Qu6Q=";
   };
 
-  vendorHash = "sha256-MveNLXINvxAjJOG9nvXgfSxnEUkHI0Bnqxmgg/0Qu6Q=";
+  vendorHash = "sha256-juiJGX0wax1iIAODAgBUNLlfFg4kd14bB6IeEqohs8U=";
 
   meta = {
     description = "Wings";

@@ -17,7 +17,7 @@ let
     owner = "pelican-dev";
     repo = "panel";
     rev = "v${version}";
-    sha256 = "";
+    sha256 = "sha256-+nP6J+ZdtWtR4bo8DQkvnS5jVbjvxITnWvwkR+izOYY=";
   };
   phpOut = import ./pelican-panel-php.nix {
     inherit
