@@ -2,10 +2,6 @@
 
 set -e
 
-quiet() {
-    "$@" >/dev/null 2>&1
-}
-
 get_latest_version() {
     local repo=$1
     curl -s "https://api.github.com/repos/pelican-dev/$repo/releases/latest" | jq -r '.tag_name' | sed 's/^v//'
@@ -21,7 +17,7 @@ update_source_hash() {
     local file=$1
     local repo=$2
     local version=$3
-    local hash=$(nix-shell -p nix-prefetch-github --run "nix-prefetch-github pelican-dev $repo --rev v$version" | jq -r '.hash')
+    local hash=$(nix-shell -p nix-prefetch-github --run "nix-prefetch-github pelican-dev $repo --rev v$version" 2>/dev/null | jq -r '.hash')
     sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"$hash\";|" "$file"
 }
 
@@ -30,7 +26,7 @@ update_dependency_hash() {
     local hash_key=$2
     local flake=$3
     sed -i "s|$hash_key = \"sha256-.*\";|$hash_key = \"\";|" "$file"
-    local hash=$(nix build ".#$flake" 2>&1 | grep -oP 'got:\s+\K\S+' | head -1)
+    local hash=$(nix build ".#$flake" 2>&1 >/dev/null | grep -oP 'got:\s+\K\S+' | head -1)
     sed -i "s|$hash_key = \"\";|$hash_key = \"$hash\";|" "$file"
 }
 
@@ -53,16 +49,16 @@ panel_version=$(get_latest_version "panel")
 wings_version=$(get_latest_version "wings")
 
 echo "🔧 Updating Pelican Panel to $panel_version"
-quiet update_version "lib/pelican-panel.nix" "$panel_version"
-quiet update_source_hash "lib/pelican-panel.nix" "panel" "$panel_version"
-quiet update_vendor_hash "lib/pelican-panel-php.nix" "pelican-panel"
-quiet update_hash "lib/pelican-panel-js.nix" "pelican-panel"
+update_version "lib/pelican-panel.nix" "$panel_version"
+update_source_hash "lib/pelican-panel.nix" "panel" "$panel_version"
+update_vendor_hash "lib/pelican-panel-php.nix" "pelican-panel"
+update_hash "lib/pelican-panel-js.nix" "pelican-panel"
 
 echo "🔧 Updating Wings to $wings_version"
-quiet update_version "lib/wings.nix" "$wings_version"
-quiet update_source_hash "lib/wings.nix" "wings" "$wings_version"
+update_version "lib/wings.nix" "$wings_version"
+update_source_hash "lib/wings.nix" "wings" "$wings_version"
 
 echo "🔧 Updating Wings vendor hash..."
-quiet update_vendor_hash "lib/wings.nix" "wings"
+update_vendor_hash "lib/wings.nix" "wings"
 
 echo "✅ Done! Updated to Panel $panel_version, Wings $wings_version"
