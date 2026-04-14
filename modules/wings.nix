@@ -16,10 +16,7 @@ let
   configPathInEtc = "/pelican/config.yml";
   configPath = "/etc" + configPathInEtc;
 
-
-  configWithoutToken = convertAttributes (
-    builtins.removeAttrs cfg.node [ "tokenPath" ]
-  );
+  configWithoutToken = convertAttributes (builtins.removeAttrs cfg.node [ "tokenPath" ]);
 
   baseConfigFile = (pkgs.formats.yaml { }).generate "wings-config-base.yml" configWithoutToken;
 
@@ -223,7 +220,10 @@ in
         WorkingDirectory = "/var/lib/pelican";
         StateDirectory = "pelican";
         LogsDirectory = "pelican";
-        AmbientCapabilities = [ "CAP_CHOWN" ];
+        AmbientCapabilities = [
+          "CAP_CHOWN"
+          "CAP_DAC_OVERRIDE"
+        ];
       };
     };
 
