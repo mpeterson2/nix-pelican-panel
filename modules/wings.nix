@@ -223,6 +223,7 @@ in
         WorkingDirectory = "/var/lib/pelican";
         StateDirectory = "pelican";
         LogsDirectory = "pelican";
+        AmbientCapabilities = [ "CAP_CHOWN" ];
       };
     };
 
