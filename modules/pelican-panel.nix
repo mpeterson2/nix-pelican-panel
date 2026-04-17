@@ -108,6 +108,13 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ artisanWrapper ];
 
+    users.users."${cfg.user}" = {
+      isSystemUser = true;
+      group = cfg.group;
+    };
+
+    users.groups.acme.members = lib.mkIf cfg.nginx.enableACME [ "pelican" ];
+
     services.phpfpm.pools."${cfg.phpfpm.poolName}" = {
       user = cfg.user;
       group = cfg.group;
