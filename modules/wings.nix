@@ -163,6 +163,12 @@ in
             description = "The remote of the node.";
             type = lib.types.str;
           };
+
+          allowedOrigins = lib.mkOption {
+            description = "Allowed CORS origins for the node.";
+            default = [ ];
+            type = lib.types.listOf lib.types.str;
+          };
         };
       };
     };
