@@ -15,10 +15,10 @@ update_version() {
 
 update_source_hash() {
     local file=$1
-    local repo=$2
-    local version=$3
-    local hash=$(nix-shell -p nix-prefetch-github --run "nix-prefetch-github pelican-dev $repo --rev v$version" 2>/dev/null | jq -r '.hash')
-    sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"$hash\";|" "$file"
+    local flake=$2
+    sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"\";|" "$file"
+    local hash=$(nix build ".#$flake" 2>&1 >/dev/null | grep -oP 'got:\s+\K\S+' | head -1)
+    sed -i "s|sha256 = \"\";|sha256 = \"$hash\";|" "$file"
 }
 
 update_dependency_hash() {
@@ -50,13 +50,13 @@ wings_version=$(get_latest_version "wings")
 
 echo "🔧 Updating Pelican Panel to $panel_version"
 update_version "lib/pelican-panel.nix" "$panel_version"
-update_source_hash "lib/pelican-panel.nix" "panel" "$panel_version"
+update_source_hash "lib/pelican-panel.nix" "pelican-panel"
 update_vendor_hash "lib/pelican-panel-php.nix" "pelican-panel"
 update_hash "lib/pelican-panel-js.nix" "pelican-panel"
 
 echo "🔧 Updating Wings to $wings_version"
 update_version "lib/wings.nix" "$wings_version"
-update_source_hash "lib/wings.nix" "wings" "$wings_version"
+update_source_hash "lib/wings.nix" "wings"
 
 echo "🔧 Updating Wings vendor hash..."
 update_vendor_hash "lib/wings.nix" "wings"
