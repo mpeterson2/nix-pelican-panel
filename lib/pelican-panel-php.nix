@@ -29,7 +29,7 @@ pkgs.php.buildComposerProject {
   inherit src;
 
   composerLock = "$src/composer.lock";
-  vendorHash = "sha256-YR7k9u6pToto5VfG5mBeyPemyiCvEX1j/AEiQSIbwWE=";
+  vendorHash = "";
 
   php = phpWithExtensions;
 
