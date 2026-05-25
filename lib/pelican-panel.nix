@@ -12,12 +12,12 @@
 }:
 
 let
-  version = "1.0.0-beta33";
+  version = "1.0.0-beta34";
   src = fetchFromGitHub {
     owner = "pelican-dev";
     repo = "panel";
     rev = "v${version}";
-    sha256 = "sha256-+nP6J+ZdtWtR4bo8DQkvnS5jVbjvxITnWvwkR+izOYY=";
+    sha256 = "sha256-apqExVgE3E+hL59oR5BWCfBPisyJ+5weCktGqmp2PRw=";
   };
   phpOut = import ./pelican-panel-php.nix {
     inherit
