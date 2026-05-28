@@ -13,21 +13,39 @@ update_version() {
     sed -i "s/version = \".*\";/version = \"$version\";/" "$file"
 }
 
+capture_hash() {
+    local flake=$1
+    local output
+    output=$(nix build --no-link ".#$flake" 2>&1) || true
+    local hash
+    hash=$(echo "$output" | grep -oP 'got:\s+\K\S+' | head -1)
+    if [ -z "$hash" ]; then
+        echo "Error: failed to capture hash for .#$flake — build output:" >&2
+        echo "$output" >&2
+        exit 1
+    fi
+    echo "$hash"
+}
+
 update_source_hash() {
     local file=$1
     local flake=$2
-    sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"\";|" "$file"
-    local hash=$(nix build ".#$flake" 2>&1 >/dev/null | grep -oP 'got:\s+\K\S+' | head -1)
-    sed -i "s|sha256 = \"\";|sha256 = \"$hash\";|" "$file"
+    local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"$zero\";|" "$file"
+    local hash
+    hash=$(capture_hash "$flake")
+    sed -i "s|sha256 = \"$zero\";|sha256 = \"$hash\";|" "$file"
 }
 
 update_dependency_hash() {
     local file=$1
     local hash_key=$2
     local flake=$3
-    sed -i "s|$hash_key = \"sha256-.*\";|$hash_key = \"\";|" "$file"
-    local hash=$(nix build ".#$flake" 2>&1 >/dev/null | grep -oP 'got:\s+\K\S+' | head -1)
-    sed -i "s|$hash_key = \"\";|$hash_key = \"$hash\";|" "$file"
+    local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    sed -i "s|$hash_key = \"sha256-.*\";|$hash_key = \"$zero\";|" "$file"
+    local hash
+    hash=$(capture_hash "$flake")
+    sed -i "s|$hash_key = \"$zero\";|$hash_key = \"$hash\";|" "$file"
 }
 
 update_vendor_hash() {
