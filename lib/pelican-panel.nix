@@ -57,6 +57,7 @@ pkgs.stdenv.mkDerivation {
 
   passthru = {
     php = phpOut.php;
+    inherit phpOut jsOut;
   };
 
   meta = {

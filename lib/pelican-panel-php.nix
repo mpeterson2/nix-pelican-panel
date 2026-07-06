@@ -31,19 +31,6 @@ pkgs.php.buildComposerProject {
 
   php = phpWithExtensions;
 
-  composerRepository = phpWithExtensions.mkComposerRepository {
-    inherit pname version src composerLock vendorHash;
-    composer = phpWithExtensions.packages.composer-local-repo-plugin;
-    composerNoDev = true;
-    composerNoPlugins = true;
-    composerNoScripts = true;
-    composerStrictValidation = true;
-    postPatch = ''
-      substituteInPlace composer.json \
-        --replace-fail '"preferred-install": "dist"' '"preferred-install": "source"'
-    '';
-  };
-
   passthru = {
     php = phpWithExtensions;
   };

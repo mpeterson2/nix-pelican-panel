@@ -47,4 +47,8 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     cp -r public/build $out
   '';
+
+  passthru = {
+    inherit (finalAttrs) yarnOfflineCache;
+  };
 })
