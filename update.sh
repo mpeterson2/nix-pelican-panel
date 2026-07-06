@@ -27,25 +27,43 @@ capture_hash() {
     echo "$hash"
 }
 
+
+set_hash_and_verify() {
+    local file=$1
+    local key_pattern=$2 # "sha256" or "vendorHash"
+    local flake=$3
+    local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
+    local attempt hash build_output
+    for attempt in 1 2 3; do
+        sed -i "s|$key_pattern = \".*\";|$key_pattern = \"$zero\";|" "$file"
+        hash=$(capture_hash "$flake")
+        sed -i "s|$key_pattern = \"$zero\";|$key_pattern = \"$hash\";|" "$file"
+
+        build_output=$(nix build --no-link ".#$flake" 2>&1) && return 0
+
+        if ! echo "$build_output" | grep -qF "specified: $hash"; then
+            return 0
+        fi
+        echo "⚠️ $key_pattern for .#$flake did not reproduce on attempt $attempt, recapturing..." >&2
+    done
+
+    echo "Error: $key_pattern for .#$flake did not stabilize after $attempt attempts — last build output:" >&2
+    echo "$build_output" >&2
+    exit 1
+}
+
 update_source_hash() {
     local file=$1
     local flake=$2
-    local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-    sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"$zero\";|" "$file"
-    local hash
-    hash=$(capture_hash "$flake")
-    sed -i "s|sha256 = \"$zero\";|sha256 = \"$hash\";|" "$file"
+    set_hash_and_verify "$file" "sha256" "$flake"
 }
 
 update_dependency_hash() {
     local file=$1
     local hash_key=$2
     local flake=$3
-    local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-    sed -i "s|$hash_key = \"sha256-.*\";|$hash_key = \"$zero\";|" "$file"
-    local hash
-    hash=$(capture_hash "$flake")
-    sed -i "s|$hash_key = \"$zero\";|$hash_key = \"$hash\";|" "$file"
+    set_hash_and_verify "$file" "$hash_key" "$flake"
 }
 
 update_vendor_hash() {
