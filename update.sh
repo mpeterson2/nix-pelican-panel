@@ -15,10 +15,11 @@ update_version() {
 
 capture_hash() {
     local flake=$1
+    local zero=$2
     local output
     output=$(nix build --no-link ".#$flake" 2>&1) || true
     local hash
-    hash=$(echo "$output" | grep -oP 'got:\s+\K\S+' | head -1)
+    hash=$(echo "$output" | grep -A1 -F "specified: $zero" | grep -oP 'got:\s+\K\S+' | head -1)
     if [ -z "$hash" ]; then
         echo "Error: failed to capture hash for .#$flake — build output:" >&2
         echo "$output" >&2
@@ -33,7 +34,7 @@ update_source_hash() {
     local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     sed -i "s|sha256 = \"sha256-.*\";|sha256 = \"$zero\";|" "$file"
     local hash
-    hash=$(capture_hash "$flake")
+    hash=$(capture_hash "$flake" "$zero")
     sed -i "s|sha256 = \"$zero\";|sha256 = \"$hash\";|" "$file"
 }
 
@@ -44,7 +45,7 @@ update_dependency_hash() {
     local zero="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     sed -i "s|$hash_key = \"sha256-.*\";|$hash_key = \"$zero\";|" "$file"
     local hash
-    hash=$(capture_hash "$flake")
+    hash=$(capture_hash "$flake" "$zero")
     sed -i "s|$hash_key = \"$zero\";|$hash_key = \"$hash\";|" "$file"
 }
 
