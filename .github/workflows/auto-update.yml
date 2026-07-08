@@ -83,6 +83,7 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Auto-merge
+        if: steps.changes.outputs.changed == 'true' && steps.build.outputs.success == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge "${{ steps.pr.outputs.url }}" --squash --delete-branch
