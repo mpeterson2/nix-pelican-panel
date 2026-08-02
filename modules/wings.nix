@@ -16,7 +16,7 @@ let
   configPathInEtc = "/pelican/config.yml";
   configPath = "/etc" + configPathInEtc;
 
-  configWithoutToken = convertAttributes (builtins.removeAttrs cfg.node [ "tokenPath" ]);
+  configWithoutToken = convertAttributes (removeAttrs cfg.node [ "tokenPath" ]);
 
   baseConfigFile = (pkgs.formats.yaml { }).generate "wings-config-base.yml" configWithoutToken;
 
