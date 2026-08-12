@@ -34,13 +34,7 @@ jobs:
 
       - name: Verify build
         if: steps.changes.outputs.changed == 'true'
-        id: build
-        run: |
-          if nix build .#pelican-panel .#wings; then
-            exit 0
-          else
-            exit 1
-          fi
+        run: nix build .#pelican-panel .#wings
 
       - name: Get versions
         if: steps.changes.outputs.changed == 'true'
@@ -66,11 +60,7 @@ jobs:
           git commit -m "chore: update panel to ${{ steps.versions.outputs.panel }}, wings to ${{ steps.versions.outputs.wings }}"
           git push origin "$branch"
 
-          if [ "${{ steps.build.outputs.success }}" = "true" ]; then
-            build_line="**Build:** ✅ passing — will auto-merge"
-          else
-            build_line="**Build:** ❌ failing — manual review required"
-          fi
+          build_line="**Build:** ✅ passing"
 
           url=$(gh pr create \
             --title "chore: update panel ${{ steps.versions.outputs.panel }}, wings ${{ steps.versions.outputs.wings }}" \
@@ -83,7 +73,7 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Auto-merge
-        if: steps.changes.outputs.changed == 'true' && steps.build.outputs.success == 'true'
+        if: steps.changes.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge "${{ steps.pr.outputs.url }}" --squash --delete-branch
