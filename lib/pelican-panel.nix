@@ -14,7 +14,7 @@
 let
   version = "1.0.0-beta36";
   src = fetchFromGitHub {
-    owner = "pelican-dev";
+    owner = "pelican";
     repo = "panel";
     rev = "v${version}";
     sha256 = "sha256-RLeR5oqu+XJpb2IJDSM31t4YFsT+XWK/CWs1l6K5sac=";

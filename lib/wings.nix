@@ -13,7 +13,7 @@ buildGoModule {
   inherit version;
 
   src = fetchFromGitHub {
-    owner = "pelican-dev";
+    owner = "pelican";
     repo = "wings";
     rev = "v${version}";
     sha256 = "sha256-7s/LcbttPwVw1HCFdFzGqevella3qPM/Dy3eMI9q2Cs=";

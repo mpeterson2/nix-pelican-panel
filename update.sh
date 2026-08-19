@@ -4,7 +4,7 @@ set -e
 
 get_latest_version() {
     local repo=$1
-    curl -s "https://api.github.com/repos/pelican-dev/$repo/releases/latest" | jq -r '.tag_name' | sed 's/^v//'
+    curl -s "https://api.github.com/repos/pelican/$repo/releases/latest" | jq -r '.tag_name' | sed 's/^v//'
 }
 
 update_version() {
