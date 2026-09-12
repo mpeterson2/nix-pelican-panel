@@ -179,14 +179,8 @@ in
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/testing"
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/framework/views"
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.runtimeLocation}/storage/logs"
-          ''
-            ${pkgs.rsync}/bin/rsync -a --delete \
-            --exclude='.env' \
-            --exclude='storage' \
-            --exclude='database/database.sqlite' \
-            ${pelicanPanelPkg}/share/php/pelican-panel/ \
-            ${cfg.runtimeLocation}/
-          ''
+          "${pkgs.rsync}/bin/rsync -a --delete --exclude='.env' --exclude='storage' --exclude='database/database.sqlite' ${pelicanPanelPkg}/share/php/pelican-panel/ ${cfg.runtimeLocation}/"
+          "${pkgs.rsync}/bin/rsync -a --checksum --delete ${pelicanPanelPkg}/share/php/pelican-panel/public/build/ ${cfg.runtimeLocation}/public/build/"
           "${pkgs.coreutils}/bin/chown -R ${cfg.user}:${cfg.group} ${cfg.runtimeLocation}"
           "${pkgs.coreutils}/bin/chmod -R 755 ${cfg.runtimeLocation}"
 
